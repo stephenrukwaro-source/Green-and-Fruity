@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vegetable Shop App Installer</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #a7ffeb);
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .app-icon {
+      width: 120px;
+      height: 120px;
+      margin: 20px 0;
+      border-radius: 25%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      background: url('https://example.com/your-icon.png') no-repeat center/cover; /* Replace with your icon */
+    }
+
+    h1 { color: #00796b; font-size: 2em; margin-bottom: 10px; }
+    p { color: #004d40; font-size: 1em; margin-bottom: 20px; }
+
+    .install-button {
+      background-color: #00796b;
+      color: white;
+      font-size: 1.2em;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+    .install-button:hover { background-color: #004d40; transform: scale(1.05); }
+
+    .note { margin-top: 10px; font-size: 0.9em; color: #004d40; }
+
+    .animation {
+      width: 50px; height: 50px;
+      border: 5px solid #00796b;
+      border-top: 5px solid #004d40;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .updates {
+      margin-top: 30px;
+      background-color: rgba(255,255,255,0.8);
+      padding: 15px 20px;
+      border-radius: 15px;
+      max-width: 350px;
+      text-align: left;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    .updates h2 { color: #00796b; font-size: 1.2em; margin-bottom: 10px; }
+    .updates ul { padding-left: 20px; color: #004d40; }
+    .updates ul li { margin-bottom: 8px; font-size: 0.95em; }
+  </style>
+</head>
+<body>
+  <div class="app-icon"></div>
+  <h1>Vegetable Shop App</h1>
+  <p id="message">Loading installer...</p>
+
+  <div class="animation" id="loader"></div>
+  
+  <a id="installButton" class="install-button" href="#" download>Install App</a>
+  <p class="note" id="note">⚠️ Make sure “Install unknown apps” is enabled in your browser settings.</p>
+
+  <div class="updates">
+    <h2>Latest Updates</h2>
+    <ul id="updatesList">
+      <li>Loading updates...</li>
+    </ul>
+  </div>
+
+  <script>
+    const installButton = document.getElementById("installButton");
+    const loader = document.getElementById("loader");
+    const message = document.getElementById("message");
+    const updatesList = document.getElementById("updatesList");
+    const note = document.getElementById("note");
+
+    function isAndroid() {
+      return /Android/i.test(navigator.userAgent);
+    }
+
+    // URL to JSON file that contains APK info
+    const apkJSON = "https://example.com/apk-info.json"; 
+    // JSON format example:
+    // {
+    //   "apkLink": "https://example.com/vegetable-shop-v1.2.apk",
+    //   "version": "1.2",
+    //   "updates": [
+    //     "Version 1.2 - Added profit/loss tracker",
+    //     "Version 1.1 - Editable pricing for all items",
+    //     "Version 1.0 - Initial release with basic stock management"
+    //   ]
+    // }
+
+    if (isAndroid()) {
+      // Fetch latest APK info
+      fetch(apkJSON)
+        .then(res => res.json())
+        .then(data => {
+          installButton.href = data.apkLink;
+          message.textContent = `Latest Version: ${data.version}. Click below to install.`;
+
+          // Populate updates
+          updatesList.innerHTML = "";
+          data.updates.forEach(u => {
+            const li = document.createElement("li");
+            li.textContent = u;
+            updatesList.appendChild(li);
+          });
+
+          // Show loader and auto-download APK
+          loader.style.display = "block";
+          setTimeout(() => {
+            window.location.href = data.apkLink;
+          }, 500);
+        })
+        .catch(err => {
+          message.textContent = "Error loading installer. Please try again later.";
+          updatesList.innerHTML = "<li>Unable to fetch updates.</li>";
+          console.error(err);
+        });
+
+    } else {
+      message.textContent = "Sorry, this installer works only on Android devices.";
+      installButton.style.display = "none";
+      loader.style.display = "none";
+      note.style.display = "none";
+      updatesList.innerHTML = "";
+    }
+  </script>
+</body>
+</html>
